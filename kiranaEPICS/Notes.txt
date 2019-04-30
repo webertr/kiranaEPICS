@@ -81,3 +81,4 @@ dumpbin /exports "C:\Program Files (x86)\Specialised Imaging\Kirana\SIInstKirana
          10   4B 0009707C SIInstWriteIDACValue
           9   4C 000970CC SIInstWriteVDACValue
 
+This is a C# console application to control a Kirana camera by Specialized Instruments. The application with interface with EPICS PV's via a Channel Access Client called EpicsSharp, written natively in C#.
