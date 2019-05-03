@@ -81,4 +81,100 @@ dumpbin /exports "C:\Program Files (x86)\Specialised Imaging\Kirana\SIInstKirana
          10   4B 0009707C SIInstWriteIDACValue
           9   4C 000970CC SIInstWriteVDACValue
 
-This is a C# console application to control a Kirana camera by Specialized Instruments. The application with interface with EPICS PV's via a Channel Access Client called EpicsSharp, written natively in C#.
+This is a C# console application to control a Kirana camera by Specialized Instruments. 
+The application with interface with EPICS PV's via a Channel Access Client called EpicsSharp, written natively in C#.
+
+Start with:
+
+SIInstLink
+
+SIInstIsLinked
+
+Could try this one:
+
+SIInstArm
+
+Would this work when the software was connected? Probably not.
+
+Could we figure out what is connected with:
+
+SIInstGetHandle
+SIInstGetInfo
+SIInstGetKiranaAlias
+
+Maybe.
+
+Going in a new direction. Use spy++ to find the window that is open. I'm seeing things like:
+
++Window 002A028C "Kirana" TfrmKTestMain
+
+And a bunch of sub windows. I think I can access these by name. Figure out what you need to click to arm or set the delay. It should be just that simple. 
+
+Once you know the window name, check out this resource:
+
+https://docs.microsoft.com/en-us/dotnet/framework/winforms/how-to-simulate-mouse-and-keyboard-events-in-code
+
+Here is a sample:
+
+// Get a handle to an application window.
+[DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
+public static extern IntPtr FindWindow(string lpClassName,
+    string lpWindowName);
+
+// Activate an application window.
+[DllImport("USER32.DLL")]
+public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+// Send a series of key presses to the Calculator application.
+private void button1_Click(object sender, EventArgs e)
+{
+    // Get a handle to the Calculator application. The window class
+    // and window name were obtained using the Spy++ tool.
+    IntPtr calculatorHandle = FindWindow("CalcFrame","Calculator");
+
+    // Verify that Calculator is a running process.
+    if (calculatorHandle == IntPtr.Zero)
+    {
+        MessageBox.Show("Calculator is not running.");
+        return;
+    }
+
+    // Make Calculator the foreground application and send it 
+    // a set of calculations.
+    SetForegroundWindow(calculatorHandle);
+    SendKeys.SendWait("111");
+    SendKeys.SendWait("*");
+    SendKeys.SendWait("11");
+    SendKeys.SendWait("=");
+}
+
+I think you can send an enter command with:
+
+To send a keystroke to the same application
+Call the Send or SendWait method of the SendKeys class. The specified keystrokes will be received by the active control of the application. 
+The following code example uses Send to simulate pressing the ENTER key when the user double-clicks the surface of the form. 
+This example assumes a Form with a single Button control that has a tab index of 0.
+
+C#
+
+Copy
+// Send a key to the button when the user double-clicks anywhere 
+// on the form.
+private void Form1_DoubleClick(object sender, EventArgs e)
+{
+    // Send the enter key to the button, which raises the click 
+    // event for the button. This works because the tab stop of 
+    // the button is 0.
+    SendKeys.Send("{ENTER}");
+}
+
+We want to use the "SendKeys" class. 
+
+Use SendKeys to send keystrokes and keystroke combinations to the active application. 
+This class cannot be instantiated. 
+To send a keystroke to a class and immediately continue with the flow of your program, use Send. 
+To wait for any processes started by the keystroke, use SendWait.
+
+To specify characters that aren't displayed when you press a key, such as ENTER or TAB, and keys that represent actions rather than characters, use the codes in the following table.
+
+ENTER is "{ENTER}" or "~"
