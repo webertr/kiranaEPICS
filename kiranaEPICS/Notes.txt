@@ -178,3 +178,83 @@ To wait for any processes started by the keystroke, use SendWait.
 To specify characters that aren't displayed when you press a key, such as ENTER or TAB, and keys that represent actions rather than characters, use the codes in the following table.
 
 ENTER is "{ENTER}" or "~"
+
+Here is the working code:
+
+using System;
+using System.Runtime.InteropServices;
+
+
+namespace kiranaEPICS
+{
+
+    class Program
+    {
+        // Get a handle to an application window.
+        [DllImport("USER32.DLL", CharSet = CharSet.Unicode)]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        // Activate an application window.
+        [DllImport("USER32.DLL")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        static void Main(string[] args)
+        {
+            // Get a handle to the Calculator application. The window class
+            // and window name were obtained using the Spy++ tool.
+            //IntPtr kiranaHandle = FindWindow("TfrmKTestMain", "Kirana");
+            IntPtr kiranaHandle = FindWindow("TAboutDlg", "About");
+
+            // Verify that Calculator is a running process.
+            if (kiranaHandle == IntPtr.Zero)
+            {
+                System.Console.WriteLine("Did not find window");
+            } else
+            {
+                System.Console.WriteLine("Found window");
+            }
+
+            SetForegroundWindow(kiranaHandle);
+
+            System.Windows.Forms.SendKeys.SendWait("{ENTER}");
+
+            System.Console.ReadKey();
+
+            // Make Calculator the foreground application and send it 
+            // a set of calculations.
+            //SetForegroundWindow(calculatorHandle);
+            //System.Windows.Forms.SendKeys.SendWait("111");
+
+        }
+    }
+}
+
+
+Now trying this:
+
+Install TestStack.White from NuGet
+
+PM> Install-Package TestStack.White
+
+Did get this warning:
+
+The names of some imported commands from the module 'TestStack.White' include unapproved verbs that might make them less discoverable. 
+To find the commands with unapproved verbs, run the Import-Module command again with the Verbose parameter. 
+For a list of approved verbs, type Get-Verb.
+
+Have you looked at White TestStack?
+
+Sample code:
+
+Application application = Application.Launch("foo.exe");
+Window window = application.GetWindow("bar", InitializeOption.NoCache);
+
+Button button = window.Get<Button>("save");
+button.Click();
+
+I don't think it can get better than that. The library is created by ThoughtWorks.
+
+https://stackoverflow.com/questions/1134993/control-another-application-using-c-sharp
+
+https://github.com/TestStack/White
+
