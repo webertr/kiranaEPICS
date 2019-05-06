@@ -62,7 +62,16 @@ namespace kiranaEPICS
             // Finding the arm button. Need to disable a thrown Exception, NonComVisibleClass or something.
             armButton = window.Get<TestStack.White.UIItems.Button>("Arm");
 
-            Console.WriteLine("Finished");
+            // Another way to do it.
+            //window.Get<TestStack.White.UIItems.UIItem>("Arm").Click();
+
+            // Sleeping for 10 seconds
+            //System.Threading.Thread.Sleep(10000);
+
+            // Closing the application
+            //window.TitleBar.CloseButton.Click();
+
+            System.Console.WriteLine("Finished");
 
             // Infinite sleep
             System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite);

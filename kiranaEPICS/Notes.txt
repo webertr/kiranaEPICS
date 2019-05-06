@@ -258,3 +258,29 @@ https://stackoverflow.com/questions/1134993/control-another-application-using-c-
 
 https://github.com/TestStack/White
 
+This TestStack White package:
+https://teststackwhite.readthedocs.io/en/latest/
+
+Search criteria:
+
+SearchCriteria searchCriteria = SearchCriteria.ByAutomationId("name").AndControlType(typeof(TextBox)).AndIndex(2);
+TextBox textBox = (TextBox) window.Get(searchCriteria);
+textBox.Text = "Anil";
+
+Is this a managed or un-managed application?
+
+A managed application runs on the CLR, Common Language Runtime.
+
+Is this Kirana application a managed application?
+
+I don't think it is because it is a .exe file. I think a managed application would be in a portable execution file, .pe
+
+Button button = window.Get<Button>("btnOK"); //<Button> acts as criteria as well as the return type
+button = (Button) window.Get(SearchCriteria.ByAutomationId("btnOK").AndControlType(typeof(Button))); // same as above
+
+For the close button, it's in the:
+
+Class: TfrmKTestMain
+Caption: Kirana
+
+There is a minimize, maximize and close. Hmm....
