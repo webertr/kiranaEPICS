@@ -284,3 +284,24 @@ Class: TfrmKTestMain
 Caption: Kirana
 
 There is a minimize, maximize and close. Hmm....
+
+You could also search like this:
+
+button = window.Get<Button>(SearchCriteria.ByText("OK"));
+
+or this
+
+Button button = window.Get<Button>("OK"); //default search mechanism is by UIAutomation name
+
+
+The type helps identify the item:
+
+Button button = window.Get<Button>("btnOK"); //<Button> acts as criteria as well as the return type
+button = (Button) window.Get(SearchCriteria.ByAutomationId("btnOK").AndControlType(typeof(Button))); // same as above
+
+The text would potentially change. The automation id changes less frequently.
+
+// if there are two buttons with the same automation id.
+button = window.Get<Button>(SearchCriteria.ByAutomationId("btnOK").AndIndex(1));
+
+Starting with Frame Rate. What is it? A TextBox? A ListItem? It appears to not be enabled? Is the only way to select it by referencing the current value?

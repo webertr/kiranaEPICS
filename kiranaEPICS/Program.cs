@@ -25,6 +25,7 @@ namespace kiranaEPICS
 
         // global variables for the Kirana API
         private static TestStack.White.UIItems.Button armButton;
+        private static TestStack.White.UIItems.TextBox frameRate;
         private static TestStack.White.UIItems.WindowItems.Window window;
         private static TestStack.White.Factory.InitializeOption initializeOption;
         private static TestStack.White.Application application = TestStack.White.Application.Launch("C:\\Program Files (x86)\\Specialised Imaging\\Kirana\\Kirana.exe");
@@ -61,6 +62,10 @@ namespace kiranaEPICS
 
             // Finding the arm button. Need to disable a thrown Exception, NonComVisibleClass or something.
             armButton = window.Get<TestStack.White.UIItems.Button>("Arm");
+
+            frameRate = window.Get<TestStack.White.UIItems.TextBox>("1000");
+
+            frameRate.BulkText = "500";
 
             // Another way to do it.
             //window.Get<TestStack.White.UIItems.UIItem>("Arm").Click();
