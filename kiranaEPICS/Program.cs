@@ -95,9 +95,10 @@ namespace kiranaEPICS
             System.Console.WriteLine("Number: {0}", loadButton.Name);
             System.Console.WriteLine("Enabled: {0}", loadButton.Enabled);
 
-            loadButton.Click();
-            loadButton.Enter("180830020.SVF");
-            loadButton.Enter("\n");
+            // Clicking on the load button
+            //loadButton.Click();
+            //loadButton.Enter("180830020.SVF");
+            //loadButton.Enter("\n");
 
             // A way to search by the ID
             //searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByAutomationId(frameRate.Id);
