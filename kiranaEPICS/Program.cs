@@ -26,8 +26,10 @@ namespace kiranaEPICS
         // global variables for the Kirana API
         private static TestStack.White.UIItems.Button armButton;
         private static string armButtonID;
-        private static TestStack.White.UIItems.TextBox frameRate;
+        private static TestStack.White.UIItems.IUIItem frameRate;
         private static string frameRateID;
+        private static TestStack.White.UIItems.IUIItem exposure;
+        private static string exposureID;
         private static TestStack.White.UIItems.WindowStripControls.ToolStrip toolBar;
         private static string toolBarID;
         private static TestStack.White.UIItems.IUIItem loadButton;
@@ -79,12 +81,9 @@ namespace kiranaEPICS
             //window.Get<TestStack.White.UIItems.UIItem>("Arm").Click();
 
             // Finding the TextBox that has the frame rate.
-            searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TEdit").AndByText("1000");
-            frameRate = (TestStack.White.UIItems.TextBox)window.Get(searchCriteria);
-            frameRateID = frameRate.Id;
-            System.Console.WriteLine("Enabled: {0}", frameRate.Enabled);
-            System.Console.WriteLine("Name: {0}", frameRate.Name);
-            System.Console.WriteLine("ID: {0}", frameRate.Id);
+            //searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TEdit").AndByText("1000");
+            //frameRate = (TestStack.White.UIItems.TextBox)window.Get(searchCriteria);
+            //frameRateID = frameRate.Id;
 
             // Find the top tool bar that has a "save" and "load" option
             searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TToolBar").AndIndex(0);
@@ -92,8 +91,26 @@ namespace kiranaEPICS
             toolBarID = toolBar.Id;
             TestStack.White.UIItems.IUIItem[] toolBarList = toolBar.Items.ToArray();
             loadButton = toolBarList[0];
-            System.Console.WriteLine("Number: {0}", loadButton.Name);
-            System.Console.WriteLine("Enabled: {0}", loadButton.Enabled);
+            System.Console.WriteLine("Tool Bar Number: {0}", loadButton.Name);
+            System.Console.WriteLine("Tool Bar Enabled: {0}", loadButton.Enabled);
+
+            // Here is another method to get buttons. Get one of the "TPanel" class. THere should be alot.
+            searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TPanel").AndIndex(4);
+            TestStack.White.UIItems.Panel test = (TestStack.White.UIItems.Panel)window.Get(searchCriteria);
+            // Get all of the items in the panel as a collection
+            TestStack.White.UIItems.UIItemCollection collectionTest = test.Items;
+            // Convert the collection to an array. Now you can pull off IUIItems, and potentially click.
+            TestStack.White.UIItems.IUIItem[] collectionArray = (TestStack.White.UIItems.IUIItem[])collectionTest.ToArray();
+            exposure = collectionArray[0];
+            exposureID = exposure.Id;
+            frameRate = collectionArray[1];
+            frameRateID = frameRate.Id;
+            System.Console.WriteLine("Exposure Enabled: {0}", exposure.Enabled);
+            System.Console.WriteLine("Exposure Name: {0}", exposure.Name);
+            System.Console.WriteLine("Exposure ID: {0}", exposure.Id);
+            System.Console.WriteLine("Frame Rate Enabled: {0}", frameRate.Enabled);
+            System.Console.WriteLine("Frame Rate Name: {0}", frameRate.Name);
+            System.Console.WriteLine("Frame Rate ID: {0}", frameRate.Id);
 
             // Clicking on the load button
             //loadButton.Click();
