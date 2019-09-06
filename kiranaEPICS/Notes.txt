@@ -305,3 +305,5 @@ The text would potentially change. The automation id changes less frequently.
 button = window.Get<Button>(SearchCriteria.ByAutomationId("btnOK").AndIndex(1));
 
 Starting with Frame Rate. What is it? A TextBox? A ListItem? It appears to not be enabled? Is the only way to select it by referencing the current value?
+
+You use spy++ in tools to figure out what the UI items actually are.

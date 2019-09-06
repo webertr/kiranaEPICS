@@ -33,6 +33,8 @@ namespace kiranaEPICS
         private static TestStack.White.UIItems.WindowStripControls.ToolStrip toolBar;
         private static string toolBarID;
         private static TestStack.White.UIItems.IUIItem loadButton;
+        private static TestStack.White.UIItems.IUIItem saveButton;
+        private static TestStack.White.UIItems.IUIItem linkCameraButton;
         private static TestStack.White.UIItems.Finders.SearchCriteria searchCriteria;
         private static TestStack.White.UIItems.WindowItems.Window window;
         private static TestStack.White.Factory.InitializeOption initializeOption;
@@ -91,6 +93,10 @@ namespace kiranaEPICS
             toolBarID = toolBar.Id;
             TestStack.White.UIItems.IUIItem[] toolBarList = toolBar.Items.ToArray();
             loadButton = toolBarList[0];
+            saveButton = toolBarList[1];
+            linkCameraButton = toolBarList[3];
+
+            saveButton = toolBarList[1];
             System.Console.WriteLine("Tool Bar Number: {0}", loadButton.Name);
             System.Console.WriteLine("Tool Bar Enabled: {0}", loadButton.Enabled);
 
@@ -117,6 +123,14 @@ namespace kiranaEPICS
             //loadButton.Enter("180830020.SVF");
             //loadButton.Enter("\n");
 
+            // Clicking on the save button
+            //saveButton.Click();
+            //saveButton.Enter("180830020.SVF");
+            //saveButton.Enter("\n");
+
+            // Clicking on the link camera button
+            //linkCameraButton.Click();
+
             // A way to search by the ID
             //searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByAutomationId(frameRate.Id);
 
@@ -127,6 +141,12 @@ namespace kiranaEPICS
             //window.TitleBar.CloseButton.Click();
 
             System.Console.WriteLine("Finished");
+
+            System.Threading.Thread.Sleep(5000);
+
+            //saveButton.Click();
+            //loadButton.Enter("K:\\Kirana Videos\\temp.SVF");
+            //loadButton.Enter("\n");
 
             // Infinite sleep
             System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite);
