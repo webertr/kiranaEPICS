@@ -307,3 +307,41 @@ button = window.Get<Button>(SearchCriteria.ByAutomationId("btnOK").AndIndex(1));
 Starting with Frame Rate. What is it? A TextBox? A ListItem? It appears to not be enabled? Is the only way to select it by referencing the current value?
 
 You use spy++ in tools to figure out what the UI items actually are.
+
+Here is some code that worked, that I am taking out.
+
+// Two ways to arm the camera
+//armButton.Click();
+//window.Get<TestStack.White.UIItems.UIItem>("Arm").Click();
+
+// Finding the TextBox that has the frame rate.
+//searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TEdit").AndByText("1000");
+//frameRate = (TestStack.White.UIItems.TextBox)window.Get(searchCriteria);
+//frameRateID = frameRate.Id;
+
+// Clicking on the load button
+//loadButton.Click();
+//loadButton.Enter("180830020.SVF");
+//loadButton.Enter("\n");
+
+// Clicking on the save button
+//saveButton.Click();
+//saveButton.Enter("180830020.SVF");
+//saveButton.Enter("\n");
+
+// Clicking on the link camera button
+//linkCameraButton.Click();
+
+// A way to search by the ID
+//searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByAutomationId(frameRate.Id);
+
+// Sleeping for 10 seconds
+//System.Threading.Thread.Sleep(10000);
+
+// Closing the application
+//window.TitleBar.CloseButton.Click();
+
+
+//saveButton.Click();
+//loadButton.Enter("K:\\Kirana Videos\\temp.SVF");
+//loadButton.Enter("\n");

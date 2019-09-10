@@ -8,19 +8,21 @@ namespace kiranaEPICS
 
     class Program
     {
-
         // Global variables for the EPICS interface
         private static int armValue;
+        private static int saveValue;
         private static int shotNumber;
         private static string fileBase;
         private static string folderBase;
         private static string shotNumberString;
-        private static string folderBaseTemplate = "K:\\Fuze Data\\Spectroscopy (NAS)\\Data\\???";
+        private static string folderBaseTemplate = "K:\\Fuze Data\\FuZE Kirana Movies\\???";
         private static EpicsSharp.ChannelAccess.Client.CAClient client;
         private static EpicsSharp.ChannelAccess.Client.Channel armChannel;
         private static EpicsSharp.ChannelAccess.Client.Channel shotNumberChannel;
+        private static EpicsSharp.ChannelAccess.Client.Channel saveChannel;
         private static readonly string armPV = "FuZE:ControlPLC:KiranaAcquire";
         private static readonly string shotNumberPV = "FuZE:DataServer:ShotNumber";
+        private static readonly string savePV = "FuZE:ControlPLC:KiranaSave";
         private static System.Threading.Mutex mutexKirana = new System.Threading.Mutex();
 
         // global variables for the Kirana API
@@ -48,7 +50,7 @@ namespace kiranaEPICS
             System.Threading.Thread.Sleep(10000);
 
             // Code to interface with EPICS
-            if (false) {
+            if (true) {
                 // Setting up EPICS channel access client
                 client = new EpicsSharp.ChannelAccess.Client.CAClient();
 
@@ -67,6 +69,13 @@ namespace kiranaEPICS
 
                 // Setting callback for monitor
                 shotNumberChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(shotNumberCallBack);
+
+                // Creating channel for save PV and getting initial value
+                saveChannel = client.CreateChannel<int>(savePV);
+                saveValue = saveChannel.Get<int>(1);
+
+                // Setting callback for save monitor
+                saveChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(saveCallBack);
             }
 
 
@@ -77,15 +86,6 @@ namespace kiranaEPICS
             // Finding the arm button. Need to disable a thrown Exception, NonComVisibleClass or something.
             armButton = window.Get<TestStack.White.UIItems.Button>("Arm");
             armButtonID = armButton.Id;
-
-            // Two ways to arm the camera
-            //armButton.Click();
-            //window.Get<TestStack.White.UIItems.UIItem>("Arm").Click();
-
-            // Finding the TextBox that has the frame rate.
-            //searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TEdit").AndByText("1000");
-            //frameRate = (TestStack.White.UIItems.TextBox)window.Get(searchCriteria);
-            //frameRateID = frameRate.Id;
 
             // Find the top tool bar that has a "save" and "load" option
             searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TToolBar").AndIndex(0);
@@ -103,8 +103,10 @@ namespace kiranaEPICS
             // Here is another method to get buttons. Get one of the "TPanel" class. THere should be alot.
             searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByClassName("TPanel").AndIndex(4);
             TestStack.White.UIItems.Panel test = (TestStack.White.UIItems.Panel)window.Get(searchCriteria);
+
             // Get all of the items in the panel as a collection
             TestStack.White.UIItems.UIItemCollection collectionTest = test.Items;
+
             // Convert the collection to an array. Now you can pull off IUIItems, and potentially click.
             TestStack.White.UIItems.IUIItem[] collectionArray = (TestStack.White.UIItems.IUIItem[])collectionTest.ToArray();
             exposure = collectionArray[0];
@@ -118,35 +120,12 @@ namespace kiranaEPICS
             System.Console.WriteLine("Frame Rate Name: {0}", frameRate.Name);
             System.Console.WriteLine("Frame Rate ID: {0}", frameRate.Id);
 
-            // Clicking on the load button
-            //loadButton.Click();
-            //loadButton.Enter("180830020.SVF");
-            //loadButton.Enter("\n");
-
-            // Clicking on the save button
-            //saveButton.Click();
-            //saveButton.Enter("180830020.SVF");
-            //saveButton.Enter("\n");
-
-            // Clicking on the link camera button
-            //linkCameraButton.Click();
-
-            // A way to search by the ID
-            //searchCriteria = TestStack.White.UIItems.Finders.SearchCriteria.ByAutomationId(frameRate.Id);
-
-            // Sleeping for 10 seconds
-            //System.Threading.Thread.Sleep(10000);
-
-            // Closing the application
-            //window.TitleBar.CloseButton.Click();
-
             System.Console.WriteLine("Finished");
 
             System.Threading.Thread.Sleep(5000);
 
-            //saveButton.Click();
-            //loadButton.Enter("K:\\Kirana Videos\\temp.SVF");
-            //loadButton.Enter("\n");
+            // Clicking on the link camera button
+            linkCameraButton.Click();
 
             // Infinite sleep
             System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite);
@@ -179,6 +158,17 @@ namespace kiranaEPICS
         }
 
         /*
+         * Method that will update the save value. Called as callback from PV change
+         */
+        public static void saveCallBack(EpicsSharp.ChannelAccess.Client.Channel channel, object newValue)
+        {
+            shotNumber = (int)newValue;
+            System.Threading.ThreadStart childRef = new System.Threading.ThreadStart(saveThread);
+            System.Threading.Thread childThread = new System.Threading.Thread(childRef);
+            childThread.Start();
+        }
+
+        /*
          * Method to arm the Kirana. Called from the callback function as a thread
          */
         public static void armKiranaThread()
@@ -191,6 +181,7 @@ namespace kiranaEPICS
 
         /*
          * Method called by the callback to update the shot number
+         * Sets the folder base, and the file base, or the shot number.
          */
         public static void shotNumberThread()
         {
@@ -201,6 +192,19 @@ namespace kiranaEPICS
             folderBase = folderBaseTemplate.Replace("???", baseShotNumberString);
             System.IO.Directory.CreateDirectory(folderBase);
             System.Console.WriteLine("Updated shot number to: {0}", shotNumber);
+            mutexKirana.ReleaseMutex();
+        }
+
+        /*
+         * Method to save the Kirana. Called from the callback function as a thread
+         */
+        public static void saveThread()
+        {
+            mutexKirana.WaitOne();            
+            saveButton.Click();
+            saveButton.Enter(folderBase + "\\" + fileBase + ".SVF");
+            saveButton.Enter("\n");
+            System.Console.WriteLine("Saving the Kirana video with: {0}", saveValue);
             mutexKirana.ReleaseMutex();
         }
     }
