@@ -49,36 +49,6 @@ namespace kiranaEPICS
             // Sleeping for 10 seconds while application loads
             System.Threading.Thread.Sleep(10000);
 
-            // Code to interface with EPICS
-            if (true) {
-                // Setting up EPICS channel access client
-                client = new EpicsSharp.ChannelAccess.Client.CAClient();
-
-                // Specifying the gateway so it doesn't search the other networks for PV's. It will slow it down.
-                client.Configuration.SearchAddress = "10.10.10.249";
-
-                // Creating channel for arm PV and getting intial value
-                armChannel = client.CreateChannel<int>(armPV);
-                armValue = armChannel.Get<int>(1);
-
-                // Setting callback for monitor
-                armChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(armCallBack);
-
-                // Creating channel for shotnumber PV.
-                shotNumberChannel = client.CreateChannel<int>(shotNumberPV);
-
-                // Setting callback for monitor
-                shotNumberChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(shotNumberCallBack);
-
-                // Creating channel for save PV and getting initial value
-                saveChannel = client.CreateChannel<int>(savePV);
-                saveValue = saveChannel.Get<int>(1);
-
-                // Setting callback for save monitor
-                saveChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(saveCallBack);
-            }
-
-
             // Setting up Kirana software interface
             initializeOption = TestStack.White.Factory.InitializeOption.NoCache;
             window = application.GetWindow("Kirana", initializeOption);
@@ -122,6 +92,36 @@ namespace kiranaEPICS
 
             System.Console.WriteLine("Finished");
 
+            // Code to interface with EPICS
+            if (true)
+            {
+                // Setting up EPICS channel access client
+                client = new EpicsSharp.ChannelAccess.Client.CAClient();
+
+                // Specifying the gateway so it doesn't search the other networks for PV's. It will slow it down.
+                client.Configuration.SearchAddress = "10.10.10.249";
+
+                // Creating channel for arm PV and getting intial value
+                armChannel = client.CreateChannel<int>(armPV);
+                armValue = armChannel.Get<int>(1);
+
+                // Setting callback for monitor
+                armChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(armCallBack);
+
+                // Creating channel for shotnumber PV.
+                shotNumberChannel = client.CreateChannel<int>(shotNumberPV);
+
+                // Setting callback for monitor
+                shotNumberChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(shotNumberCallBack);
+
+                // Creating channel for save PV and getting initial value
+                saveChannel = client.CreateChannel<int>(savePV);
+                saveValue = saveChannel.Get<int>(1);
+
+                // Setting callback for save monitor
+                saveChannel.MonitorChanged += new EpicsSharp.ChannelAccess.Client.ChannelValueDelegate(saveCallBack);
+            }
+
             System.Threading.Thread.Sleep(5000);
 
             // Clicking on the link camera button
@@ -162,7 +162,7 @@ namespace kiranaEPICS
          */
         public static void saveCallBack(EpicsSharp.ChannelAccess.Client.Channel channel, object newValue)
         {
-            shotNumber = (int)newValue;
+            saveValue = (int)newValue;
             System.Threading.ThreadStart childRef = new System.Threading.ThreadStart(saveThread);
             System.Threading.Thread childThread = new System.Threading.Thread(childRef);
             childThread.Start();
@@ -174,8 +174,20 @@ namespace kiranaEPICS
         public static void armKiranaThread()
         {
             mutexKirana.WaitOne();
-            armButton.Click();
-            System.Console.WriteLine("Arming the Kirana with: {0}", armValue);
+
+            if (armValue.Equals(1))
+            {
+                if (armButton.Enabled)
+                {
+                    armButton.Click();
+                    System.Console.WriteLine("Arming the Kirana with: {0}", armValue);
+                }
+                else
+                {
+                    System.Console.WriteLine("Cannot arm Kirana, arm button disabled");
+                }
+            }
+
             mutexKirana.ReleaseMutex();
         }
 
@@ -200,11 +212,23 @@ namespace kiranaEPICS
          */
         public static void saveThread()
         {
-            mutexKirana.WaitOne();            
-            saveButton.Click();
-            saveButton.Enter(folderBase + "\\" + fileBase + ".SVF");
-            saveButton.Enter("\n");
-            System.Console.WriteLine("Saving the Kirana video with: {0}", saveValue);
+            mutexKirana.WaitOne();    
+            
+            if (saveValue.Equals(1))
+            {
+                if (saveButton.Enabled)
+                {
+                    saveButton.Click();
+                    saveButton.Enter(folderBase + "\\" + fileBase + ".SVF");
+                    saveButton.Enter("\n");
+                    System.Console.WriteLine("Saving the Kirana video with: {0}", saveValue);
+                }
+                else
+                {
+                    System.Console.WriteLine("Save button not enabled");
+                }
+            }
+
             mutexKirana.ReleaseMutex();
         }
     }
